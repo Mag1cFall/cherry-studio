@@ -77,6 +77,11 @@
       "settings.reasoning_effort.low": "稍微思考",
       "settings.reasoning_effort.medium": "正常思考",
       "settings.reasoning_effort.default": "預設",
+      "settings.include_thoughts": "思想摘要",
+      "settings.include_thoughts.tip": "啟用後，Gemini-2.5系列模型會輸出推理摘要",
+      "settings.thinking_budget": "思考預算",
+      "settings.thinking_budget.tip": "Pro: 128-32768, Flash: 0-24576 (0為關閉)",
+      "settings.thinking_budget.auto": "自動設定",
       "settings.more": "助手設定",
       "settings.regular_phrases": {
         "title": "常用短语",

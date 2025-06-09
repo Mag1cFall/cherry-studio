@@ -77,6 +77,11 @@
       "settings.reasoning_effort.low": "少しの思考",
       "settings.reasoning_effort.medium": "普通の思考",
       "settings.reasoning_effort.default": "デフォルト",
+      "settings.include_thoughts": "思考サマリー",
+      "settings.include_thoughts.tip": "有効にすると、Gemini-2.5シリーズモデルは推論の要約を出力します。",
+      "settings.thinking_budget": "思考バジェット",
+      "settings.thinking_budget.tip": "Pro: 128-32768, Flash: 0-24576 (0で無効)",
+      "settings.thinking_budget.auto": "自動設定",
       "settings.more": "アシスタント設定",
       "settings.regular_phrases": {
         "title": "定型プロンプト",

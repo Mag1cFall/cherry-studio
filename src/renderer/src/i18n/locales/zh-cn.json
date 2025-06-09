@@ -84,6 +84,11 @@
       "settings.reasoning_effort.medium": "斟酌",
       "settings.reasoning_effort.high": "沉思",
       "settings.reasoning_effort.default": "默认",
+      "settings.include_thoughts": "思想摘要",
+      "settings.include_thoughts.tip": "启用后，Gemini-2.5系列模型会输出推理摘要",
+      "settings.thinking_budget": "思考预算",
+      "settings.thinking_budget.tip": "Pro: 128-32768, Flash: 0-24576 (0为关闭)",
+      "settings.thinking_budget.auto": "自动设置",
       "settings.more": "助手设置",
       "settings.regular_phrases": {
         "title": "常用短语",

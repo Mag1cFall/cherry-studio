@@ -108,19 +108,36 @@ const ThinkingButton: FC<Props> = ({ ref, model, assistant, ToolbarButton }): Re
   const onThinkingChange = useCallback(
     (option?: ThinkingOption) => {
       const isEnabled = option !== undefined && option !== 'off'
-      // 然后更新设置
+
       if (!isEnabled) {
         updateAssistantSettings({
           reasoning_effort: undefined,
-          qwenThinkMode: false
+          qwenThinkMode: false,
+          includeThoughts: false,
+          thinkingBudget: 0,
+          autoThinkingBudget: true
         })
         return
       }
+
+      const effortToBudgetMap = {
+        off: 0,
+        low: 4096,
+        medium: 8192,
+        high: 16384,
+        auto: 0 // 'auto' will be handled by auto-thinking-budget
+      }
+
+      const newThinkingBudget = effortToBudgetMap[option]
+      const newAutoThinkingBudget = option === 'auto'
+
       updateAssistantSettings({
         reasoning_effort: option,
-        qwenThinkMode: true
+        qwenThinkMode: true,
+        includeThoughts: true,
+        thinkingBudget: newThinkingBudget,
+        autoThinkingBudget: newAutoThinkingBudget
       })
-      return
     },
     [updateAssistantSettings]
   )

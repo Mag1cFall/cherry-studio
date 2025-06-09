@@ -285,40 +285,23 @@ export default class GeminiProvider extends BaseProvider {
    */
   private getBudgetToken(assistant: Assistant, model: Model) {
     if (isGeminiReasoningModel(model)) {
-      const reasoningEffort = assistant?.settings?.reasoning_effort
-      const GEMINI_FLASH_MODEL_REGEX = new RegExp('gemini-.*-flash.*$')
+      const { includeThoughts, thinkingBudget, autoThinkingBudget } = assistant.settings || {}
 
-      // 如果thinking_budget是undefined，不思考
-      if (reasoningEffort === undefined) {
-        return {
-          thinkingConfig: {
-            includeThoughts: false,
-            ...(GEMINI_FLASH_MODEL_REGEX.test(model.id) ? { thinkingBudget: 0 } : {})
-          } as ThinkingConfig
-        }
+      if (includeThoughts === false) {
+        return { thinkingConfig: { includeThoughts: false } }
       }
 
-      const effortRatio = EFFORT_RATIO[reasoningEffort]
-
-      if (effortRatio > 1) {
-        return {
-          thinkingConfig: {
-            includeThoughts: true
-          }
-        }
-      }
-
-      const { max } = findTokenLimit(model.id) || { max: 0 }
-      const budget = Math.floor(max * effortRatio)
-
-      return {
-        thinkingConfig: {
-          ...(budget > 0 ? { thinkingBudget: budget } : {}),
+      if (includeThoughts === true || includeThoughts === undefined) {
+        const config: ThinkingConfig = {
           includeThoughts: true
-        } as ThinkingConfig
+        }
+
+        if (!autoThinkingBudget && thinkingBudget && thinkingBudget > 0) {
+          config.thinkingBudget = thinkingBudget
+        }
+        return { thinkingConfig: config }
       }
     }
-
     return {}
   }
 

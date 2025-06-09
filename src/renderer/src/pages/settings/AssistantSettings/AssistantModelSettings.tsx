@@ -3,6 +3,7 @@ import ModelAvatar from '@renderer/components/Avatar/ModelAvatar'
 import { HStack } from '@renderer/components/Layout'
 import SelectModelPopup from '@renderer/components/Popups/SelectModelPopup'
 import { DEFAULT_CONTEXTCOUNT, DEFAULT_TEMPERATURE } from '@renderer/config/constant'
+import { findTokenLimit, isGeminiReasoningModel } from '@renderer/config/models'
 import { SettingRow } from '@renderer/pages/settings'
 import { Assistant, AssistantSettingCustomParameters, AssistantSettings } from '@renderer/types'
 import { modalConfirm } from '@renderer/utils'
@@ -30,6 +31,12 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
   const [customParameters, setCustomParameters] = useState<AssistantSettingCustomParameters[]>(
     assistant?.settings?.customParameters ?? []
   )
+  const [includeThoughts, setIncludeThoughts] = useState(assistant?.settings?.includeThoughts ?? false)
+  const [thinkingBudget, setThinkingBudget] = useState(assistant?.settings?.thinkingBudget ?? 0)
+  const [autoThinkingBudget, setAutoThinkingBudget] = useState(assistant?.settings?.autoThinkingBudget ?? true)
+
+  const isGeminiModel = assistant.model ? isGeminiReasoningModel(assistant.model) : false
+  const tokenLimit = assistant.model ? findTokenLimit(assistant.model.id) : { min: 0, max: 32768 }
 
   const customParametersRef = useRef(customParameters)
 
@@ -393,6 +400,80 @@ const AssistantModelSettings: FC<Props> = ({ assistant, updateAssistant, updateA
           <Select.Option value="function">{t('assistants.settings.tool_use_mode.function')}</Select.Option>
         </Select>
       </SettingRow>
+      {isGeminiModel && (
+        <>
+          <Divider style={{ margin: '10px 0' }} />
+          <SettingRow style={{ minHeight: 30 }}>
+            <Label>
+              {t('assistants.settings.include_thoughts')}{' '}
+              <Tooltip title={t('assistants.settings.include_thoughts.tip')}>
+                <QuestionIcon />
+              </Tooltip>
+            </Label>
+            <Switch
+              checked={includeThoughts}
+              onChange={(checked) => {
+                setIncludeThoughts(checked)
+                updateAssistantSettings({ includeThoughts: checked })
+              }}
+            />
+          </SettingRow>
+          {includeThoughts && (
+            <>
+              <Row align="middle" justify="space-between">
+                <HStack>
+                  <Label>
+                    {t('assistants.settings.thinking_budget')}{' '}
+                    <Tooltip title={t('assistants.settings.thinking_budget.tip')}>
+                      <QuestionIcon />
+                    </Tooltip>
+                  </Label>
+                </HStack>
+                <HStack>
+                  <Label>{t('assistants.settings.thinking_budget.auto')}</Label>
+                  <Switch
+                    checked={autoThinkingBudget}
+                    onChange={(checked) => {
+                      setAutoThinkingBudget(checked)
+                      updateAssistantSettings({ autoThinkingBudget: checked })
+                    }}
+                  />
+                </HStack>
+              </Row>
+              <Row align="middle" gutter={20}>
+                <Col span={20}>
+                  <Slider
+                    min={tokenLimit?.min || 0}
+                    max={tokenLimit?.max || 32768}
+                    onChange={setThinkingBudget}
+                    onChangeComplete={(value) => updateAssistantSettings({ thinkingBudget: value })}
+                    value={thinkingBudget}
+                    step={128}
+                    disabled={autoThinkingBudget}
+                  />
+                </Col>
+                <Col span={4}>
+                  <InputNumber
+                    min={tokenLimit?.min || 0}
+                    max={tokenLimit?.max || 32768}
+                    step={128}
+                    value={thinkingBudget}
+                    changeOnBlur
+                    onChange={(value) => {
+                      if (!isNull(value)) {
+                        setThinkingBudget(value)
+                        setTimeout(() => updateAssistantSettings({ thinkingBudget: value }), 500)
+                      }
+                    }}
+                    style={{ width: '100%' }}
+                    disabled={autoThinkingBudget}
+                  />
+                </Col>
+              </Row>
+            </>
+          )}
+        </>
+      )}
       <Divider style={{ margin: '10px 0' }} />
       <SettingRow style={{ minHeight: 30 }}>
         <Label>{t('models.custom_parameters')}</Label>
